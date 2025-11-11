@@ -23,14 +23,14 @@ load([channel_path, '1_1'], 'H'); % Load the Channel Data
 thresold = inf;
 [idx, C] = clustering(lamda,thresold);
 % C代表每个用户组的平均RSRP向量=>(J, Tx_CB_size)
-% idx表示各个用户对应的组号
-% 由于每个用户最多两流，所以扩展为nUE*2个虚拟单天线用户
+% J = nGropus
+% idx表示各个用户对应的组号=>(nUE,1)
+% 由于每个用户最多两流，所以扩展为nUE*2个虚拟单天线用户[idx;idx]
 idx = repmat(reshape(idx, [], 1), [2,1]);
 
 %% -4 Calculating the channel correlation matrix
 nGroups = length(unique(idx));
 rankRcron = zeros(nGroups, 1);
-
 for ki = 1:nGroups
     % 对于每一个用户组，计算平均信道空域相关矩阵
     Rcron(:, :, ki) = calRcron(C(ki, :).', Tx_CB);
@@ -38,7 +38,7 @@ for ki = 1:nGroups
     rankRcron(ki) = 2;
     % 强制规定每个用户最多2流
 end
-
+fprintf('开始长时优化\n');
 %% 5 Optimizing analog precoding and scheduling schemes
 run("calFS.m")
 save('single_lamda_scatter.mat')
@@ -55,7 +55,7 @@ R_smoothed = qo' * r_realUser * nRB * nCarrierPerRB * nSymbolsPerTTI / LenOfTTI;
 % % R_smoothed = 3.1364e+07 * ones(1, nUE);
 Queues = pSize * poissrnd(10 * LenOfTTI / pInterval, 1, nUE);
 
-
+fprintf('开始短时调度\n');
 for iter_slot = 1:nSlotPerFrame
     %% 6 TTI scheduling
     timeSharing_count = zeros(kL, 1);
@@ -114,12 +114,19 @@ for iter_slot = 1:nSlotPerFrame
 end
 for j = 1:nGroups
     group_rate_DE(j) = qo' * mean(R_DE(:, find(idx(1:nUE)==j)),2);
-    group_rate_DE_mat(j,:) = mean(R_DE(:, find(idx(1:nUE)==j)),2);
+    group_rate_DE_mat_J(j,:) = mean(R_DE(:, find(idx(1:nUE)==j)),2);
 end
 
-r_DE_avg = (qo' * R_DE);
 for j = 1:nGroups
     group_rate_real(j) = mean(mean(R_real(:, find(idx(1:nUE)==j)),2),1);
     group_rate_real_mat(j,:) = mean(R_real(:, find(idx(1:nUE)==j)),2);
 end
+
+for i=1:size(group_rate_real_mat, 2)
+    group_rate_real_DE_mat(:, i) = group_rate_DE_mat_J(:,timeSharing_record(i));
+end
+
+
+r_DE_avg = (qo' * R_DE);
+
 UserRealRates_avg = mean(R_real, 1);

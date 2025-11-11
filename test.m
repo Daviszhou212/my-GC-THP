@@ -1,5 +1,3 @@
-clc;clear;
-load("single_lamda_scatter.mat");
 R_direct = zeros(Ms, Ms, nGroups);
 H_from_1_1 = H; % 明确我们使用的是 1_1.mat 的 H
 
@@ -43,3 +41,14 @@ for j = 1:nGroups
     % 计算组j的平均SCM
     R_direct(:,:,j) = R_group_j_sum / length(users_in_group_j);
 end
+
+% 1. 比较总功率 (Trace)
+trace_Rcron = squeeze(arrayfun(@(i) trace(Rcron(:,:,i)), 1:nGroups));
+trace_R_direct = squeeze(arrayfun(@(i) trace(R_direct(:,:,i)), 1:nGroups));
+disp('比较 Trace (Rcron vs R_direct):');
+disp([trace_Rcron, trace_R_direct]);
+
+% 2. 比较矩阵相似度 (Frobenius 范数)
+diff_norm = squeeze(arrayfun(@(i) norm(Rcron(:,:,i) - R_direct(:,:,i), 'fro'), 1:nGroups));
+disp('矩阵差异 (Frobenius 范数):');
+disp(diff_norm);

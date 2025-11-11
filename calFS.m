@@ -4,7 +4,7 @@ Kv = zeros(nGroups, 1);
 for i = 1:numel(idx)
     Kv(idx(i)) = Kv(idx(i)) + 1;
 end
-
+% 这个文件中包含tlt的变量就是记录各个长时方案的
 %% 初始化
 % 是为了找到一个比较好的初始变量
 weight = ones(sum(Kv), 1);
@@ -24,7 +24,6 @@ while ~isempty(find(weight_rate == 0, 1))
     r_tlt(kL, :) = r_propose;
     weight_rate = (ones(kL, 1) / kL)' * r_tlt;
 end
-
 iter = 1;
 rateU_pre = 0;
 %% 迭代优化速率最大化
@@ -36,11 +35,21 @@ while (1)
     end
     r_realUser = r_imagUser(:,1:nUE) + r_imagUser(:,nUE+1:2*nUE);
     % 基于当前的{F,Sv}的集合，使用fmincon优化效用函数
-    qo = fmincon(@(q)CalUq(q, r_realUser), ones(kL, 1) / kL, [], [], ones(1, kL), 1, zeros(kL, 1), ones(kL, 1), []);
+    % qo = fmincon(@(q)CalUq(q, r_realUser), ones(kL, 1) / kL, [], [], ones(1, kL), 1, zeros(kL, 1), ones(kL, 1), []);
+    % 使用cvx替代：
+    cvx_begin quiet % 'quiet' 模式可以抑制求解过程的输出
+        cvx_solver Mosek_5
+        variable qo(kL) % 定义 q 是一个 kL x 1 的变量
+        rate_per_user = qo.' * r_realUser;
+        maximize( geo_mean(rate_per_user + 10^-6) )
+        subject to
+            sum(qo) == 1;
+            qo >= 0;
+    cvx_end
     % 计算加权速率
     weight_rate = qo' * r_tlt;
     rateU = CalUq(qo, r_realUser);
-    disp(rateU - rateU_pre)
+    fprintf('PF效用函数增加%f\n',-rateU + rateU_pre);
     % 收敛检查
     if iter > 20 || abs(rateU - rateU_pre) < 10^ - 4
         break;

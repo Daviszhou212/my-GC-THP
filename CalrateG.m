@@ -9,8 +9,8 @@ end
 eps = zeros(J,1);
 epspre=zeros(J,1);
 left = 1;
-% 迭代20次
-while left<=20
+% 迭代40次
+while left<=40
     Tinv=eye(M);
     for kj=1:J
         Tinv=Tinv+Sv(kj)*R_effct(:,:,kj)/(miu+eps(kj))/M;
