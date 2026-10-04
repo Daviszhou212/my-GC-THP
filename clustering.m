@@ -3,14 +3,14 @@ function [idx, C] = clustering(X, thresold)
     nUE = size(X, 2);
     idx =  zeros(nUE, 1);
     
-    %%% First layer 基于信道方向的分簇
+    %%% First layer
     X_norm = zeros(size(X));
     for k = 1:nUE
         X_norm(:,k) = X(:,k) / norm(X(:,k));
     end
     [idx1, C1] = kmeansth(X_norm, 0.4, nUE);
     
-    %%% Second layer 在First layer的分簇结果基础上，在每个簇内基于信道能量的分簇
+    %%% Second layer
     for k = 1:nUE
         X_A(1,k) =  norm(X(:,k));
     end

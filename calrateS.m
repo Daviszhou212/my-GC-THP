@@ -1,6 +1,5 @@
 function [Rw F r_propose] = calrateS(idx, Sv,Kv,M,NRF,Tx_CB,Rcron,PT,miu,weight)
-% 根据Sv向量，从Tx_CB中为每个组贪婪选择波束
-% 直到填满RF链，从而确定模拟预编码器F
+
 if sum(Sv)==0
     F=zeros(M,NRF);
     Rw=0;
@@ -20,7 +19,6 @@ else
             Tx_CBtemp=Tx_CBtemp(:,Eindx(Sv(kj)+1:Nc));
         end
     end
-    % 射频链还有空余，再加
     if sum(Sv) < NRF
         [M,Nc]=size(Tx_CBtemp);
         Rcronsum=zeros(M,M);

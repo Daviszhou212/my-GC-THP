@@ -1,16 +1,13 @@
 function r_propose = CalrateG(M,Sv,PT,miu,R,F)
-% 求解不动点方程，来得到速率DE
 S=sum(Sv);
 J = length(Sv);
-% \tilde{R}
 for kj=1:J
     R_effct(:,:,kj) = F * (F') * R(:,:,kj) * F * (F');
 end
 eps = zeros(J,1);
 epspre=zeros(J,1);
 left = 1;
-% 迭代40次
-while left<=40
+while left<=20
     Tinv=eye(M);
     for kj=1:J
         Tinv=Tinv+Sv(kj)*R_effct(:,:,kj)/(miu+eps(kj))/M;

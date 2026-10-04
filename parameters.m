@@ -1,5 +1,5 @@
 %channelData
-channel_path = '../channel/';
+channel_path = 'E:/linbaishuo/channel/';
 
 AllUsers = 1:30;
 % % pg_dB = randn(1,30) + [-112*ones(1,5), -108*ones(1,5), -109*ones(1,5), -106*ones(1,5), -115*ones(1,5), -105-10*rand(1,5)];
@@ -26,12 +26,12 @@ miu2 = 1e-12;
 PT = Pt_By_N0;
 
 nUE = numel(AllUsers);             % # of users
-nRB = 2;             % # of RB
+nRB = 20;             % # of RB
 
 nCarrierPerRB = 12;   % # of subcarriers of each RB
 subcarrierSpacing = 120e3;
-nSlotPerFrame = 1;    % # of slots in each frame
-nTTiPerSlot = 1600;    % # of TTIs in each slot
+nSlotPerFrame = 4;    % # of slots in each frame
+nTTiPerSlot = 160;    % # of TTIs in each slot
 nSymbolsPerTTI = 14;  % # of symbols in each TTI
 Fc = 28e9;            % Center frequency in [Hz]
 LenOfTTI = 125e-6;    % Length of one TTI in [s]

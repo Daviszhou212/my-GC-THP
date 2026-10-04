@@ -1,6 +1,5 @@
 function Rcron = calRcron(lamda, Tx_CB)
-% 根据BS码本与RSRP计算平均空间协方差矩阵
-    m = size(lamda, 1);
+    m = size(lamda);
     [n, ~] = size(Tx_CB);
     Rcron = zeros(n, n);
 
